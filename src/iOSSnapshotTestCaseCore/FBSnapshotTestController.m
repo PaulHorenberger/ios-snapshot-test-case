@@ -115,8 +115,9 @@ typedef NS_ENUM(NSUInteger, FBTestSnapshotFileNameType) {
                                  error:(NSError **)errorPtr
 {
     NSString *filePath = [self _referenceFilePathForSelector:selector identifier:identifier];
-    UIImage *image = [UIImage imageWithContentsOfFile:filePath];
-    if (image == nil && errorPtr != NULL) {
+    NSError *imageFileError;
+    NSData *imageData = [NSData dataWithContentsOfFile:filePath options:0 error:&imageFileError];
+    if (imageData == nil || imageFileError != nil) {
         BOOL exists = [_fileManager fileExistsAtPath:filePath];
         if (!exists) {
             *errorPtr = [NSError errorWithDomain:FBSnapshotTestControllerErrorDomain
@@ -127,10 +128,25 @@ typedef NS_ENUM(NSUInteger, FBTestSnapshotFileNameType) {
                                             NSLocalizedFailureReasonErrorKey : @"Reference image not found. You need to run the test in record mode",
                                         }];
         } else {
+            NSString *errorMessage = [NSString stringWithFormat:@"Failed to read reference image. %@", imageFileError.localizedDescription];
             *errorPtr = [NSError errorWithDomain:FBSnapshotTestControllerErrorDomain
                                             code:FBSnapshotTestControllerErrorCodeUnknown
-                                        userInfo:nil];
+                                        userInfo:@{
+                                            FBReferenceImageFilePathKey : filePath,
+                                            NSLocalizedDescriptionKey : @"Unable to load reference image.",
+                                            NSLocalizedFailureReasonErrorKey : errorMessage,
+                                        }];
         }
+    }
+    UIImage *image = [[UIImage alloc] initWithData:imageData];
+    if (image == nil) {
+        *errorPtr = [NSError errorWithDomain:FBSnapshotTestControllerErrorDomain
+                                        code:FBSnapshotTestControllerErrorCodeUnknown
+                                    userInfo:@{
+                                        FBReferenceImageFilePathKey : filePath,
+                                        NSLocalizedDescriptionKey : @"Unable to load reference image.",
+                                        NSLocalizedFailureReasonErrorKey : @"Failed to convert NSData to UIImage",
+                                    }];
     }
     return image;
 }
