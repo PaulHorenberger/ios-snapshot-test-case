@@ -19,6 +19,7 @@
 NSString *const FBSnapshotTestControllerErrorDomain = @"FBSnapshotTestControllerErrorDomain";
 NSString *const FBReferenceImageFilePathKey = @"FBReferenceImageFilePathKey";
 NSString *const FBReferenceImageSizeKey = @"FBReferenceImageSizeKey";
+NSString *const FBReferenceFileSizeKey = @"FBReferenceFileSizeKey";
 NSString *const FBReferenceImageKey = @"FBReferenceImageKey";
 NSString *const FBCapturedImageKey = @"FBCapturedImageKey";
 NSString *const FBDiffedImageKey = @"FBDiffedImageKey";
@@ -111,6 +112,26 @@ typedef NS_ENUM(NSUInteger, FBTestSnapshotFileNameType) {
     }
 }
 
+- (NSString *)fileSizeStringForPath:(NSString *)filePath {
+    NSError *fileInfoError;
+    NSDictionary<NSFileAttributeKey, id> *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:&fileInfoError];
+    NSString *fileSizeString;
+    if (fileInfoError != nil) {
+        fileSizeString = [NSString stringWithFormat:@"error getting file attibutes. %@", fileInfoError.localizedDescription];
+    } else if (attributes == nil) {
+        fileSizeString = @"Mo file attributes available.";
+    } else {
+        NSNumber *fileSize = [attributes objectForKey: NSFileSize];
+        if (fileSize != nil) {
+            fileSizeString = [NSString stringWithFormat:@"fileSize: %lld", fileSize.longLongValue];
+        } else {
+            fileSizeString = @"Failed to read file size attribute";
+        }
+    }
+
+    return fileSizeString;
+}
+
 - (UIImage *)referenceImageForSelector:(SEL)selector
                             identifier:(NSString *)identifier
                                  error:(NSError **)errorPtr
@@ -145,7 +166,8 @@ typedef NS_ENUM(NSUInteger, FBTestSnapshotFileNameType) {
                                         code:FBSnapshotTestControllerErrorCodeUnknown
                                     userInfo:@{
                                         FBReferenceImageFilePathKey : filePath,
-                                        FBReferenceImageSizeKey : [NSNumber numberWithUnsignedInteger: imageData.length],
+                                        FBReferenceImageSizeKey : [NSString stringWithFormat:@"dataSize: %llu", (unsigned long long) [NSNumber numberWithUnsignedInteger: imageData.length]],
+                                        FBReferenceFileSizeKey : [self fileSizeStringForPath:filePath],
                                         NSLocalizedDescriptionKey : @"Unable to load reference image.",
                                         NSLocalizedFailureReasonErrorKey : @"Failed to convert NSData to UIImage",
                                     }];
