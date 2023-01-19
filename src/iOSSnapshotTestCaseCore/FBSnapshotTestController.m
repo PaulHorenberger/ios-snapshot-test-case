@@ -139,6 +139,8 @@ typedef NS_ENUM(NSUInteger, FBTestSnapshotFileNameType) {
     NSString *filePath = [self _referenceFilePathForSelector:selector identifier:identifier];
     NSError *imageFileError;
     NSData *imageData = [NSData dataWithContentsOfFile:filePath options:0 error:&imageFileError];
+    NSString *fileName = [filePath lastPathComponent];
+    NSLog(@"[FBSnapshotTestController referenceImageForSelector:identifier:error:] file: %@, size: %@", fileName, [self fileSizeStringForPath:filePath]);
     if (imageData == nil || imageFileError != nil) {
         BOOL exists = [_fileManager fileExistsAtPath:filePath];
         if (!exists) {
