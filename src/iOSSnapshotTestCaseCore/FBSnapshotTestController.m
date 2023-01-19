@@ -168,7 +168,7 @@ typedef NS_ENUM(NSUInteger, FBTestSnapshotFileNameType) {
                                         code:FBSnapshotTestControllerErrorCodeUnknown
                                     userInfo:@{
                                         FBReferenceImageFilePathKey : filePath,
-                                        FBReferenceImageSizeKey : [NSString stringWithFormat:@"dataSize: %llu", (unsigned long long) [NSNumber numberWithUnsignedInteger: imageData.length]],
+                                        FBReferenceImageSizeKey : [NSString stringWithFormat:@"dataSize: %llu", (unsigned long long) imageData.length],
                                         FBReferenceFileSizeKey : [self fileSizeStringForPath:filePath],
                                         NSLocalizedDescriptionKey : @"Unable to load reference image.",
                                         NSLocalizedFailureReasonErrorKey : @"Failed to convert NSData to UIImage",
