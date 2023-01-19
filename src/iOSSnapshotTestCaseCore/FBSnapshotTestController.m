@@ -18,6 +18,7 @@
 
 NSString *const FBSnapshotTestControllerErrorDomain = @"FBSnapshotTestControllerErrorDomain";
 NSString *const FBReferenceImageFilePathKey = @"FBReferenceImageFilePathKey";
+NSString *const FBReferenceImageSizeKey = @"FBReferenceImageSizeKey";
 NSString *const FBReferenceImageKey = @"FBReferenceImageKey";
 NSString *const FBCapturedImageKey = @"FBCapturedImageKey";
 NSString *const FBDiffedImageKey = @"FBDiffedImageKey";
@@ -144,6 +145,7 @@ typedef NS_ENUM(NSUInteger, FBTestSnapshotFileNameType) {
                                         code:FBSnapshotTestControllerErrorCodeUnknown
                                     userInfo:@{
                                         FBReferenceImageFilePathKey : filePath,
+                                        FBReferenceImageSizeKey : [NSNumber numberWithUnsignedInteger: imageData.length],
                                         NSLocalizedDescriptionKey : @"Unable to load reference image.",
                                         NSLocalizedFailureReasonErrorKey : @"Failed to convert NSData to UIImage",
                                     }];
